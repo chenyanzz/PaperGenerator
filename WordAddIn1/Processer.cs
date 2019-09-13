@@ -145,6 +145,10 @@ namespace WordAddIn1
                         }
                         pic_name = getSectionName() + "-" + ++pic_id + " " + pic_name;
 
+                        app.Selection.ParagraphFormat.IndentFirstLineCharWidth(0);
+                        app.Selection.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
+                        app.Selection.ParagraphFormat.FirstLineIndent = 0;
+                        app.Selection.ParagraphFormat.LeftIndent=0;
                         var pic = app.Selection.InlineShapes.AddPicture(pic_path);
                         pic.LockAspectRatio = Office.MsoTriState.msoTrue;
                         
@@ -189,8 +193,9 @@ namespace WordAddIn1
             doc_out.SaveAs2(path);
         }
 
-        public void process(string FomatFilePath, string MdDilePath, string OutputFilePath)
+        public bool process(string FomatFilePath, string MdDilePath, string OutputFilePath)
         {
+            label_index.Clear();
             try
             {
                 MdDirectory = System.IO.Path.GetDirectoryName(MdDilePath);
@@ -200,10 +205,11 @@ namespace WordAddIn1
                 writeDocx(OutputFilePath);
                 doc_fmt.Close();
                 doc_out.Activate();
+                return true;
             }catch(Exception e)
             {
                 System.Windows.Forms.MessageBox.Show("Error Occured:\n"+e.Message + "\n" + e.StackTrace);
-                return;
+                return false;
             }
         }
     }

@@ -8,9 +8,8 @@ namespace WordAddIn1
 {
     public partial class UI
     {
-        Processer processer;
         string FomatFilePath, MdDilePath, OutputFilePath;
-        bool formatDocxSelected = false, mdSelected = false, outputDocxSelected = false;
+        bool formatDocxSelected = false, mdSelected = false;
 
         private void UI_Load(object sender, RibbonUIEventArgs e)
         {
@@ -29,7 +28,6 @@ namespace WordAddIn1
 
         private void saveFileDialog_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            outputDocxSelected = true;
             OutputFilePath = saveFileDialog.FileName;
         }
 
@@ -40,17 +38,24 @@ namespace WordAddIn1
             if (formatDocxSelected && mdSelected)
             {
                 if (OutputFilePath == null || OutputFilePath == "") OutputFilePath = MdDilePath + ".docx";
-                Globals.ThisAddIn.processer.process(FomatFilePath, MdDilePath, OutputFilePath);
-                System.Windows.Forms.MessageBox.Show("Build Succeed!\nWrite to " + OutputFilePath);
+                if (Globals.ThisAddIn.processer.process(FomatFilePath, MdDilePath, OutputFilePath))
+                {
+                    System.Windows.Forms.MessageBox.Show("Build Succeed!\nWrite to " + OutputFilePath);
+                    formatDocxSelected = mdSelected = false;
+                    cb_DocxSelected.Name = cb_MdSelected.Name = "";
+                    FomatFilePath = MdDilePath = OutputFilePath = "";
+                }
+                else
+                {
+                    System.Windows.Forms.MessageBox.Show("Build Failed!");
+                }
             }
             else
             {
                 System.Windows.Forms.MessageBox.Show("Please Select Files First!");
             }
 
-            formatDocxSelected = mdSelected = outputDocxSelected = false;
-            cb_DocxSelected.Name = cb_MdSelected.Name = "";
-            FomatFilePath = MdDilePath = OutputFilePath = "";
+            
         }
 
         private void openFileDialog_docx_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
