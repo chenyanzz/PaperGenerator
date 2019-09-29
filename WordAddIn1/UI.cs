@@ -8,7 +8,7 @@ namespace WordAddIn1
 {
     public partial class UI
     {
-        string FomatFilePath, MdDilePath, OutputFilePath;
+        string FomatFilePath, MdDilePath, OutputFilePath, HeaderDocxPath;
         bool formatDocxSelected = false, mdSelected = false;
 
         private void UI_Load(object sender, RibbonUIEventArgs e)
@@ -31,6 +31,16 @@ namespace WordAddIn1
             OutputFilePath = saveFileDialog.FileName;
         }
 
+        private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            HeaderDocxPath = openFileDialog1.FileName;
+        }
+
+        private void btn_selecdHeaderDocx_Click(object sender, RibbonControlEventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+        }
+
         private void btn_BuildDocx_Click(object sender, RibbonControlEventArgs e)
         {
             saveFileDialog.ShowDialog();
@@ -38,12 +48,11 @@ namespace WordAddIn1
             if (formatDocxSelected && mdSelected)
             {
                 if (OutputFilePath == null || OutputFilePath == "") OutputFilePath = MdDilePath + ".docx";
-                if (Globals.ThisAddIn.processer.process(FomatFilePath, MdDilePath, OutputFilePath))
+                if (Globals.ThisAddIn.processer.process(FomatFilePath, MdDilePath,HeaderDocxPath, OutputFilePath))
                 {
                     System.Windows.Forms.MessageBox.Show("Build Succeed!\nWrite to " + OutputFilePath);
                     formatDocxSelected = mdSelected = false;
-                    cb_DocxSelected.Name = cb_MdSelected.Name = "";
-                    FomatFilePath = MdDilePath = OutputFilePath = "";
+                    FomatFilePath = MdDilePath = OutputFilePath = HeaderDocxPath = "";
                 }
                 else
                 {

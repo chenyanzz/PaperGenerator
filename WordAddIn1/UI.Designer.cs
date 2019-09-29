@@ -43,9 +43,11 @@
             this.group2 = this.Factory.CreateRibbonGroup();
             this.cb_DocxSelected = this.Factory.CreateRibbonCheckBox();
             this.cb_MdSelected = this.Factory.CreateRibbonCheckBox();
-            this.openFileDialog_docx = new System.Windows.Forms.OpenFileDialog();
+            this.btn_selecdHeaderDocx = this.Factory.CreateRibbonButton();
             this.openFileDialog_md = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.openFileDialog_docx = new System.Windows.Forms.OpenFileDialog();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.aa.SuspendLayout();
             this.group1.SuspendLayout();
             this.group2.SuspendLayout();
@@ -65,7 +67,7 @@
             this.group1.DialogLauncher = ribbonDialogLauncherImpl1;
             this.group1.Items.Add(this.btn_SelectFormatDocx);
             this.group1.Items.Add(this.btn_SelectMdFile);
-            this.group1.Items.Add(this.btn_BuildDocx);
+            this.group1.Items.Add(this.btn_selecdHeaderDocx);
             this.group1.Label = "Paper Generate";
             this.group1.Name = "group1";
             // 
@@ -91,6 +93,7 @@
             // 
             this.group2.Items.Add(this.cb_DocxSelected);
             this.group2.Items.Add(this.cb_MdSelected);
+            this.group2.Items.Add(this.btn_BuildDocx);
             this.group2.Label = "status";
             this.group2.Name = "group2";
             // 
@@ -104,10 +107,11 @@
             this.cb_MdSelected.Label = "MdSelected";
             this.cb_MdSelected.Name = "cb_MdSelected";
             // 
-            // openFileDialog_docx
+            // btn_selecdHeaderDocx
             // 
-            this.openFileDialog_docx.Filter = "Word Xml|*.docx";
-            this.openFileDialog_docx.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_docx_FileOk);
+            this.btn_selecdHeaderDocx.Label = "Select Heder Docx";
+            this.btn_selecdHeaderDocx.Name = "btn_selecdHeaderDocx";
+            this.btn_selecdHeaderDocx.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btn_selecdHeaderDocx_Click);
             // 
             // openFileDialog_md
             // 
@@ -118,6 +122,16 @@
             // 
             this.saveFileDialog.Filter = "Word Xml|*.docx";
             this.saveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog_FileOk);
+            // 
+            // openFileDialog_docx
+            // 
+            this.openFileDialog_docx.Filter = "Word Xml|*.docx";
+            this.openFileDialog_docx.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_docx_FileOk);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.Filter = "Word Xml|*.docx";
+            this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
             // 
             // UI
             // 
@@ -142,12 +156,14 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btn_SelectFormatDocx;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btn_SelectMdFile;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btn_BuildDocx;
-        private System.Windows.Forms.OpenFileDialog openFileDialog_docx;
         private System.Windows.Forms.OpenFileDialog openFileDialog_md;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group2;
         internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox cb_DocxSelected;
         internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox cb_MdSelected;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton btn_selecdHeaderDocx;
+        private System.Windows.Forms.OpenFileDialog openFileDialog_docx;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 
     partial class ThisRibbonCollection

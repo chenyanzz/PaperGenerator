@@ -12,6 +12,7 @@ namespace WordAddIn1
         {
             Application app = this.Application;
             processer = new Processer(app);
+        
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
