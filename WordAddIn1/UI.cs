@@ -44,15 +44,19 @@ namespace WordAddIn1
         private void btn_BuildDocx_Click(object sender, RibbonControlEventArgs e)
         {
             saveFileDialog.ShowDialog();
+            if(!cb_addNum.Checked) 
+                Globals.ThisAddIn.processer.addNumInTitles = false;
 
-            if (formatDocxSelected && mdSelected)
+            if (formatDocxSelected && mdSelected && (OutputFilePath != null && OutputFilePath != ""))
             {
-                if (OutputFilePath == null || OutputFilePath == "") OutputFilePath = MdDilePath + ".docx";
                 if (Globals.ThisAddIn.processer.process(FomatFilePath, MdDilePath,HeaderDocxPath, OutputFilePath))
                 {
                     System.Windows.Forms.MessageBox.Show("Build Succeed!\nWrite to " + OutputFilePath);
                     formatDocxSelected = mdSelected = false;
                     FomatFilePath = MdDilePath = OutputFilePath = HeaderDocxPath = "";
+                    cb_DocxSelected.Checked = false;
+                    cb_MdSelected.Checked = false;
+                    Globals.ThisAddIn.processer = new Processer(Globals.ThisAddIn.Application);
                 }
                 else
                 {

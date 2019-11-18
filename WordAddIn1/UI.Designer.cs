@@ -39,15 +39,16 @@
             this.group1 = this.Factory.CreateRibbonGroup();
             this.btn_SelectFormatDocx = this.Factory.CreateRibbonButton();
             this.btn_SelectMdFile = this.Factory.CreateRibbonButton();
-            this.btn_BuildDocx = this.Factory.CreateRibbonButton();
+            this.btn_selecdHeaderDocx = this.Factory.CreateRibbonButton();
             this.group2 = this.Factory.CreateRibbonGroup();
             this.cb_DocxSelected = this.Factory.CreateRibbonCheckBox();
             this.cb_MdSelected = this.Factory.CreateRibbonCheckBox();
-            this.btn_selecdHeaderDocx = this.Factory.CreateRibbonButton();
+            this.btn_BuildDocx = this.Factory.CreateRibbonButton();
             this.openFileDialog_md = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog_docx = new System.Windows.Forms.OpenFileDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.cb_addNum = this.Factory.CreateRibbonCheckBox();
             this.aa.SuspendLayout();
             this.group1.SuspendLayout();
             this.group2.SuspendLayout();
@@ -83,35 +84,38 @@
             this.btn_SelectMdFile.Name = "btn_SelectMdFile";
             this.btn_SelectMdFile.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btn_SelectMdFile_Click);
             // 
-            // btn_BuildDocx
+            // btn_selecdHeaderDocx
             // 
-            this.btn_BuildDocx.Label = "BuildDocx";
-            this.btn_BuildDocx.Name = "btn_BuildDocx";
-            this.btn_BuildDocx.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btn_BuildDocx_Click);
+            this.btn_selecdHeaderDocx.Label = "Select Heder Docx";
+            this.btn_selecdHeaderDocx.Name = "btn_selecdHeaderDocx";
+            this.btn_selecdHeaderDocx.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btn_selecdHeaderDocx_Click);
             // 
             // group2
             // 
             this.group2.Items.Add(this.cb_DocxSelected);
             this.group2.Items.Add(this.cb_MdSelected);
             this.group2.Items.Add(this.btn_BuildDocx);
+            this.group2.Items.Add(this.cb_addNum);
             this.group2.Label = "status";
             this.group2.Name = "group2";
             // 
             // cb_DocxSelected
             // 
+            this.cb_DocxSelected.Enabled = false;
             this.cb_DocxSelected.Label = "DocxSelected";
             this.cb_DocxSelected.Name = "cb_DocxSelected";
             // 
             // cb_MdSelected
             // 
+            this.cb_MdSelected.Enabled = false;
             this.cb_MdSelected.Label = "MdSelected";
             this.cb_MdSelected.Name = "cb_MdSelected";
             // 
-            // btn_selecdHeaderDocx
+            // btn_BuildDocx
             // 
-            this.btn_selecdHeaderDocx.Label = "Select Heder Docx";
-            this.btn_selecdHeaderDocx.Name = "btn_selecdHeaderDocx";
-            this.btn_selecdHeaderDocx.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btn_selecdHeaderDocx_Click);
+            this.btn_BuildDocx.Label = "BuildDocx";
+            this.btn_BuildDocx.Name = "btn_BuildDocx";
+            this.btn_BuildDocx.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btn_BuildDocx_Click);
             // 
             // openFileDialog_md
             // 
@@ -132,6 +136,12 @@
             // 
             this.openFileDialog1.Filter = "Word Xml|*.docx";
             this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
+            // 
+            // cb_addNum
+            // 
+            this.cb_addNum.Checked = true;
+            this.cb_addNum.Label = "add index No.";
+            this.cb_addNum.Name = "cb_addNum";
             // 
             // UI
             // 
@@ -164,6 +174,7 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btn_selecdHeaderDocx;
         private System.Windows.Forms.OpenFileDialog openFileDialog_docx;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox cb_addNum;
     }
 
     partial class ThisRibbonCollection

@@ -10,6 +10,7 @@ namespace WordAddIn1
 {
     public class Processer
     {
+        public bool addNumInTitles = true;
 
         Application app;
         Document doc_fmt, doc_out, doc_head;
@@ -61,11 +62,13 @@ namespace WordAddIn1
                 string line = reader.ReadLine();
                 parseLine(line, ++line_id);
             }
-            addPaperInclude(++line_id);
+            if(papersIncluded.Count!=0)
+                addPaperInclude(++line_id);
         }
 
         private void addTitle(string line)
         {
+
             int depth;
             for (depth = 0; depth < line.Length && line[depth] == '#'; depth++) ;
             string text = "";
@@ -88,14 +91,20 @@ namespace WordAddIn1
 
             label_index[depth - 1]++;
 
-            text += getSectionName();
+            if (addNumInTitles)
+            {
+                text += getSectionName();
+            }
 
             if (line.Substring(depth).Length != 0)
             {
                 if (line[depth] != ' ') text += " ";
             }
+            text += " ";//make sure 2 spaces
 
-            text += line.Substring(depth);
+            string buf = line.Substring(depth);
+
+            text += addNumInTitles? buf : buf.Trim();
 
             var font = title_font[depth - 1];
             setFont(app.Selection.Font, font);
@@ -153,7 +162,7 @@ namespace WordAddIn1
                         }
                         if (pic_name == null || pic_path == null)
                         {
-                            throw new Exception("Error Picture Definition in line" + id);
+                            throw new Exception("Error Picture Definition in line " + id + "\n>" + line);
                         }
 
                         bool isTable = false;
@@ -161,7 +170,10 @@ namespace WordAddIn1
                             line.EndsWith("t") ||
                             line.EndsWith("tbl")) isTable = true;
 
-                        pic_name = (isTable ? "表" : "图") + getSectionName() + "-" + (isTable? (++table_id):(++pic_id)) + " " + pic_name;
+                        if (addNumInTitles)
+                        {
+                            pic_name = (isTable ? "表" : "图") + getSectionName() + "-" + (isTable ? (++table_id) : (++pic_id)) + "  " + pic_name;
+                        }
 
                         Action addPic = delegate
                         {
@@ -169,18 +181,26 @@ namespace WordAddIn1
                             app.Selection.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
                             app.Selection.ParagraphFormat.FirstLineIndent = 0;
                             app.Selection.ParagraphFormat.LeftIndent = 0;
-                            var pic = app.Selection.InlineShapes.AddPicture(pic_path);
+                            InlineShape pic;
+                            try
+                            {
+                                pic = app.Selection.InlineShapes.AddPicture(pic_path);
+                            }
+                            catch (Exception e)
+                            {
+                                throw new Exception("WOW: BAD PIC NAME in line " + id + "\n>" + line);
+                            }
                             pic.LockAspectRatio = Office.MsoTriState.msoTrue;
                             //System.Windows.Forms.MessageBox.Show(pic_name+"$"+pic.Width);
                             //max width:415.3
                             const float maxWidth = 320;
-                            if(pic.Width > maxWidth) pic.Width = maxWidth;
+                            if (pic.Width > maxWidth) pic.Width = maxWidth;
                         };
                         Action addInfo = delegate
                         {
                             app.Selection.ParagraphFormat = text_format;
                             setFont(app.Selection.Font, text_font);
-                            app.Selection.Font.Size -= 2;
+                            app.Selection.Font.Size = 10.5f;//5号
                             app.Selection.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
                             app.Selection.TypeText(pic_name);
                         };
@@ -191,6 +211,16 @@ namespace WordAddIn1
                         if (isTable) addPic(); else addInfo();
                         break;
 
+                    case '-':
+                        if (line.Length <= 2)
+                        {
+                            throw new Exception("WOW: BAD -LIST in line " + id + "\n>" + line);
+                        }
+                        if (line[1] == ' ') text = ' ' + line.Substring(1);
+                        else text = line.Substring(2);
+                        addPureText(text, isList: true);
+                        break;
+
                     default:
                         //in case of `paper`
                         char[] squ = { '`' };
@@ -198,7 +228,7 @@ namespace WordAddIn1
 
                         if (parts.Length % 2 != 1)
                         {
-                            throw new Exception("Error Paper Include in line" + id);
+                            throw new Exception("WOW: BAD `PAPER` in line " + id + "\n>" + line);
                         }
 
                         for (int i = 0; i < parts.Length; i++)
@@ -207,24 +237,26 @@ namespace WordAddIn1
                             else
                             {
                                 papersIncluded.Add(parts[i]);
-                                addPureText("[" + papersIncluded.Count + "]", true);
+                                addPureText("[" + papersIncluded.Count + "]", isSuperScript: true);
                             }
                         }
                         break;
                 }
             }
+
             app.Selection.ParagraphFormat.Space15();
             app.Selection.TypeParagraph();
             app.Selection.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
         }
 
-        private void addPureText(string line, bool isSuperScript = false)
+        private void addPureText(string line, bool isSuperScript = false, bool isList = false)
         {
             setFont(app.Selection.Font, text_font);
             app.Selection.ParagraphFormat = text_format;
             app.Selection.ParagraphFormat.IndentFirstLineCharWidth(2);
             app.Selection.Font.Superscript = isSuperScript ? 1 : 0;
             app.Selection.TypeText(line);
+            if (isList) app.Selection.Range.ListFormat.ApplyBulletDefault();
         }
 
         void addPaperInclude(int lineId)
@@ -232,7 +264,7 @@ namespace WordAddIn1
             parseLine("# 参考文献", lineId);
             for (int i = 0; i < papersIncluded.Count; i++)
             {
-                addPureText("[" + (i + 1) + "]" + papersIncluded[i]);
+                addPureText("[" + (i + 1) + "]." + papersIncluded[i]);
                 app.Selection.TypeParagraph();
             }
         }
@@ -259,34 +291,36 @@ namespace WordAddIn1
         {
             label_index.Clear();
             papersIncluded.Clear();
-            try
+            //try
+            //{
+            MdDirectory = System.IO.Path.GetDirectoryName(MdDilePath);
+            readFormat(FomatFilePath);
+            doc_out = app.Documents.Add();
+            if (HeadingDocxPath != null)
             {
-                MdDirectory = System.IO.Path.GetDirectoryName(MdDilePath);
-                readFormat(FomatFilePath);
-                doc_out = app.Documents.Add();
-                if (HeadingDocxPath != null)
-                {
-                    doc_head = app.Documents.Open(HeadingDocxPath);
-                    doc_head.Activate();
-                    app.Selection.WholeStory();
-                    app.Selection.Copy();
-                    doc_out.Activate();
-                    app.Selection.PasteAndFormat(WdRecoveryType.wdFormatOriginalFormatting);
-                    app.Selection.InsertNewPage();
-                    doc_head.Close();
-                }
+                doc_head = app.Documents.Open(HeadingDocxPath);
+                doc_head.Activate();
+                app.Selection.WholeStory();
+                app.Selection.Copy();
+                app.Selection.Copy();
                 doc_out.Activate();
-                readMarkdown(MdDilePath);
-                writeDocx(OutputFilePath);
-                doc_fmt.Close();
-                doc_out.Activate();
-                return true;
+                app.Selection.Paste();
+                //app.Selection.PasteAndFormat(WdRecoveryType.wdFormatOriginalFormatting);
+                app.Selection.InsertNewPage();
+                doc_head.Close();
             }
-            catch (Exception e)
-            {
-                System.Windows.Forms.MessageBox.Show("Error Occured:\n" + e.Message + "\n" + e.StackTrace);
-                return false;
-            }
+            doc_out.Activate();
+            readMarkdown(MdDilePath);
+            writeDocx(OutputFilePath);
+            doc_fmt.Close();
+            doc_out.Activate();
+            return true;
+            //}
+            //catch (Exception e)
+            //{
+            //    System.Windows.Forms.MessageBox.Show("Error Occured:\n" + e.Message + "\n" + e.StackTrace);
+            //    return false;
+            //}
         }
     }
 }
